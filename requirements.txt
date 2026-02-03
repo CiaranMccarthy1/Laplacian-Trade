@@ -1,0 +1,13 @@
+numpy
+pandas
+ripser
+persim
+networkx
+scikit-learn
+statsmodels
+yfinance
+matplotlib
+pytest
+requests
+python-dotenv
+websockets
