@@ -46,7 +46,7 @@ This project implements a novel trading strategy that models the market as a dyn
 
 1.  **Clone the repository**:
     ```bash
-    git clone <repo-url>
+    git clone <https://github.com/CiaranMccarthy1/Laplacian-Trade>
     cd trading-algo
     ```
 
