@@ -26,11 +26,16 @@ This project implements a novel trading strategy that models the market as a dyn
 ## Project Structure
 
 ```
-├── backtest.py           # Historical backtesting engine
-├── config.py             # Global configuration (Tickers, Risk, Params)
 ├── main.py               # Live/Single-step execution entry point
-├── optimize.py           # Grid search parameter optimization
-├── check_delisted.py     # Utility to check for delisted/survivor-bias tickers
+├── core/
+│   ├── config.py         # Global configuration (Tickers, Risk, Params)
+├── simulation/
+│   ├── backtest.py       # Historical backtesting engine
+│   ├── monte_carlo.py    # Monte Carlo simulation engine
+├── optimization/
+│   ├── optimize.py       # Grid search parameter optimization
+├── utils/
+│   ├── check_delisted.py # Utility to check for delisted/survivor-bias tickers
 ├── data/
 │   └── fetcher.py        # Data ingestion (YFinance)
 ├── spatial/
@@ -64,17 +69,54 @@ This project implements a novel trading strategy that models the market as a dyn
 
 ## Usage
 
+**Note:** All scripts other than `main.py` should be run as modules from the project root to ensure imports work correctly.
+
 ### Running a Backtest
 
-To test the strategy over historical data (configured in `config.py`):
+To test the strategy over historical data (configured in `core/config.py`):
 
 ```bash
-python backtest.py
+python -m simulation.backtest
 ```
 
 Results (performance metrics and charts) will be saved to the `results/` directory.
 
-### Current Performance (10-Year Backtest)
+### Monte Carlo Simulation
+
+To project future portfolio performance and assess risk (VaR/CVaR):
+
+```bash
+python -m simulation.monte_carlo
+```
+
+### Sector Analysis
+
+To run simulations across all major market sectors and view a comparative report:
+
+```bash
+python -m simulation.run_sectors
+```
+
+**Standard Mode Sector Performance Report:**
+```text 
+SECTOR ANALYSIS REPORT (5 year)
+======================
+          Sector  Tickers Return Sharpe VaR (95%) CVaR (95%)
+   Communication       13 20.52%   0.59      $396       $985
+   Consumer Disc       14 -1.11%   0.01    $1,549     $2,168
+Consumer Staples       14 11.59%   0.46      $971     $1,532
+          Energy       14 35.93%   0.74    $2,594     $3,367
+      Financials       15 13.77%   0.45    $1,038     $1,626
+      Healthcare       15  7.11%   0.24    $1,690     $2,224
+     Industrials       15 37.72%   1.00      $555     $1,019
+          X Tech       15 21.83%   0.45    $2,722     $3,441
+       Materials       14  7.83%   0.25    $1,777     $2,297
+     Real Estate       15 -7.65%  -0.24    $2,071     $2,666
+       Utilities       15 18.51%   0.47      $588     $1,267
+     TOTAL / AVG      159 15.09%   0.40   $15,951    $22,592
+```
+
+### Current Performance (10-Year Backtest)(S&P 500 subset) 
 
 *Configuration: Aggressive Mode, 1.5x Leverage, Daily Interval*
 
@@ -104,7 +146,7 @@ Average Annual Return: 8.71%
 To find optimal parameters (Alpha, Lookback, Exposure) via grid search:
 
 ```bash
-python optimize.py
+python -m optimization.optimize
 ```
 
 ### Live/Single Step
@@ -117,7 +159,7 @@ python main.py
 
 ## Configuration
 
-Edit `config.py` to adjust:
+Edit `core/config.py` to adjust:
 *   **TICKERS**: List of assets to trade (default: S&P 500 subset).
 *   **RISK_MODE**: 'AGGRESSIVE', 'STANDARD', or 'CAUTIOUS'.
 *   **NET_EXPOSURE**: Strategy bias (0.0 = Market Neutral, 1.0 = Long Only).

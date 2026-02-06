@@ -1,10 +1,10 @@
 
 import importlib
-import config
+import core.config as config
 import pandas as pd
 import numpy as np
 from itertools import product
-import backtest
+from simulation import backtest
 
 def optimize():
     """

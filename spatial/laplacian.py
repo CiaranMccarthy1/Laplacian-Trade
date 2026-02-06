@@ -5,8 +5,7 @@ from typing import Tuple
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import config
+from core import config
 
 class SpatialGraph:
     def __init__(self, correlation_threshold: float = config.CORRELATION_THRESHOLD, alpha: float = config.ALPHA):

@@ -1,7 +1,7 @@
 import time
 import pandas as pd
 from datetime import datetime
-import config
+from core import config
 from data.fetcher import DataFetcher
 from spatial.laplacian import SpatialGraph
 from topological.homology import TopologicalFeatureExtractor

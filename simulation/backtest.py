@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
-import config
+from core import config
 from datetime import datetime, timedelta, timezone
 from spatial.laplacian import SpatialGraph
 from topological.homology import TopologicalFeatureExtractor
@@ -10,9 +10,11 @@ from integration.decision_engine import IntegrationEngine
 import sys
 import os
 
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import hashlib
 
-def fetch_historical_data(tickers, period='10y', interval='1d'):
+def fetch_historical_data(tickers, period='20y', interval='1d'):
     """
     Fetch a larger chunk of historical data for backtesting.
     Defaults to 5 years of 1d data (hourly data limited to ~2y).
@@ -102,6 +104,7 @@ def run_backtest(override_params=None):
         exposure = override_params.get('NET_EXPOSURE', exposure)
         lookback = override_params.get('LOOKBACK_WINDOW', lookback)
         rebal_freq = override_params.get('REBALANCE_FREQUENCY', rebal_freq)
+        tickers = override_params.get('TICKERS', tickers)
         
     prices = fetch_historical_data(tickers, period=config.BACKTEST_PERIOD, interval=config.TIMEFRAME)
     

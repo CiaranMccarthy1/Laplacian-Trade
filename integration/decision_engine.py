@@ -4,8 +4,7 @@ from typing import Dict, List, Tuple
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import config
+from core import config
 
 class IntegrationEngine:
     def __init__(self, risk_mode: str = config.RISK_MODE):

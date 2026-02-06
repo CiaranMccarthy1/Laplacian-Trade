@@ -7,13 +7,18 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import config
+from core import config
 
 class DataFetcher:
     def __init__(self, tickers: List[str] = config.TICKERS, interval: str = config.TIMEFRAME):
-        self.tickers = tickers
         self.interval = interval
         self.buffer = pd.DataFrame()
+        
+        if not tickers and config.ACTIVE_TICKER_SET == 'S_AND_P_FULL':
+            self.tickers = self.fetch_sp500_tickers()
+            print(f"DataFetcher: Loaded {len(self.tickers)} S&P 500 tickers (lazy load).")
+        else:
+            self.tickers = tickers
 
     @staticmethod
     def fetch_sp500_tickers() -> List[str]:
@@ -146,6 +151,60 @@ class DataFetcher:
             return pd.DataFrame()
         
         return np.log(self.buffer / self.buffer.shift(1)).dropna()
+
+    def fetch_historical_data(self, period: str = '2y') -> pd.DataFrame:
+        """
+        Fetches historical data for a specified period (e.g., '1y', '2y', '5y')
+        independent of the live trading lookback window.
+        """
+        try:
+            print(f"Fetching historical data for period: {period}...")
+            data = yf.download(
+                tickers=self.tickers,
+                period=period,
+                interval='1d',
+                group_by='ticker',
+                threads=True,
+                progress=False
+            )
+            
+            if data.empty:
+                print("Warning: No historical data returned.")
+                return pd.DataFrame()
+
+            df_close = pd.DataFrame()
+            
+            # Handle single ticker vs multiple tickers
+            if len(self.tickers) == 1:
+                # For single ticker, data columns are 'Open', 'High', etc.
+                # 'Close' is just a series/column
+                if 'Close' in data.columns:
+                    df_close[self.tickers[0]] = data['Close']
+            else:
+                for ticker in self.tickers:
+                    try:
+                        # yfinance structure varies by version and request
+                        # MultiIndex (Ticker, OHLC)
+                        if isinstance(data.columns, pd.MultiIndex):
+                            if (ticker, 'Close') in data.columns:
+                                df_close[ticker] = data[(ticker, 'Close')]
+                        # Flat columns 'Close_TICKER' (less common now but possible)
+                        elif f"Close_{ticker}" in data.columns:
+                             df_close[ticker] = data[f"Close_{ticker}"]
+                    except KeyError:
+                        pass
+
+            # Drop tickers with no data
+            df_close = df_close.dropna(axis=1, how='all')
+            # Fill forward then backward to handle different start dates or holidays
+            df_close = df_close.ffill().bfill()
+            
+            self.buffer = df_close
+            return df_close
+
+        except Exception as e:
+            print(f"Error fetching historical data: {e}")
+            return pd.DataFrame()
 
 if __name__ == "__main__":
     fetcher = DataFetcher()
