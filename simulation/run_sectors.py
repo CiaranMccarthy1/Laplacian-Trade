@@ -27,19 +27,15 @@ def run_sector_analysis():
         
         # Run Backtest
         print(" > Running Backtest...")
-        # Override with safe defaults to ensure trades happen 
         bt_metrics = backtest.run_backtest(override_params={
-            'TICKERS': tickers,
-            'ALPHA': 0.4,
-            'CORRELATION_THRESHOLD': 0.6
+            'TICKERS': tickers
         })
         if not bt_metrics:
             bt_metrics = {'Return': 0.0, 'Sharpe': 0.0}
             
         # Run Monte Carlo
         print(" > Running Monte Carlo Simulation...")
-        # Reduce dims for speed if needed, or keeping standard
-        mc = MonteCarloSimulator(tickers=tickers, simulations=500, horizon=252)
+        mc = MonteCarloSimulator(tickers=tickers)
         mc_metrics = mc.run()
         if not mc_metrics:
             mc_metrics = {'VaR_95': 0.0, 'CVaR_95': 0.0}

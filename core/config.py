@@ -13,16 +13,16 @@ TICKER_SETS = {
         'JNJ', 'PFE',
     ],
     # 11 Major GICS Sectors
-    'SECTOR_COMMUNICATION': ['GOOGL', 'META', 'NFLX', 'DIS', 'CMCSA', 'TMUS', 'VZ', 'T', 'CHTR', 'WBD', 'PARA', 'LYV', 'FOXA'],
+    # 'SECTOR_COMMUNICATION': ['GOOGL', 'META', 'NFLX', 'DIS', 'CMCSA', 'TMUS', 'VZ', 'T', 'CHTR', 'WBD', 'PARA', 'LYV', 'FOXA'], 
     'SECTOR_CONSUMER_DISC': ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'LOW', 'BKNG', 'SBUX', 'TJX', 'TGT', 'ORLY', 'MAR', 'F', 'GM'],
     'SECTOR_CONSUMER_STAPLES': ['PG', 'COST', 'PEP', 'KO', 'WMT', 'PM', 'MO', 'CL', 'KDP', 'GIS', 'SYY', 'STZ', 'EL', 'ADM'],
     'SECTOR_ENERGY': ['XOM', 'CVX', 'COP', 'SLB', 'EOG', 'MPC', 'PSX', 'VLO', 'OXY', 'HES', 'HAL', 'DVN', 'KMI', 'WMB'],
     'SECTOR_FINANCIALS': ['BRK-B', 'JPM', 'V', 'MA', 'BAC', 'WFC', 'MS', 'GS', 'BLK', 'C', 'AXP', 'PYPL', 'SCHW', 'PGR', 'CB'],
-    'SECTOR_HEALTHCARE': ['LLY', 'UNH', 'JNJ', 'MRK', 'ABBV', 'TMO', 'AMGN', 'PFE', 'ISRG', 'DHR', 'BMY', 'GILD', 'VRTX', 'SYK', 'ELV'],
+    # 'SECTOR_HEALTHCARE': ['LLY', 'UNH', 'JNJ', 'MRK', 'ABBV', 'TMO', 'AMGN', 'PFE', 'ISRG', 'DHR', 'BMY', 'GILD', 'VRTX', 'SYK', 'ELV'], 
     'SECTOR_INDUSTRIALS': ['CAT', 'GE', 'UNP', 'HON', 'BA', 'UPS', 'RTX', 'DE', 'LMT', 'ETN', 'FDX', 'MMM', 'NSC', 'WM', 'EMR'],
     'SECTOR_X_TECH': ['MSFT', 'AAPL', 'NVDA', 'AVGO', 'ORCL', 'ADBE', 'CRM', 'AMD', 'QCOM', 'TXN', 'INTC', 'IBM', 'NOW', 'AMAT', 'LRCX'],
     'SECTOR_MATERIALS': ['LIN', 'SHW', 'FCX', 'CTVA', 'ECL', 'APD', 'NEM', 'DOW', 'PPG', 'NUE', 'ALB', 'MLM', 'VMC', 'NEM'],
-    'SECTOR_REAL_ESTATE': ['PLD', 'AMT', 'EQIX', 'WELL', 'PSA', 'CCI', 'DLR', 'SPG', 'O', 'VICI', 'SBAC', 'CBRE', 'WY', 'AVB', 'ARE'],
+    # 'SECTOR_REAL_ESTATE': ['PLD', 'AMT', 'EQIX', 'WELL', 'PSA', 'CCI', 'DLR', 'SPG', 'O', 'VICI', 'SBAC', 'CBRE', 'WY', 'AVB', 'ARE'],  
     'SECTOR_UTILITIES': ['NEE', 'SO', 'DUK', 'CEG', 'AEP', 'SRE', 'D', 'EXC', 'XEL', 'PEG', 'ED', 'PCG', 'VST', 'FE', 'ETR'],
 
     # full s&p 500 
@@ -43,12 +43,12 @@ CORRELATION_THRESHOLD = 0.7
 MAX_DIMENSION = 2
 REGIME_WINDOW = 10
 
-NET_EXPOSURE = 0.6
+NET_EXPOSURE = 0.7
 
 TRANSACTION_COST_BPS = 0.0010
 REBALANCE_FREQUENCY = 10
 
-RISK_MODE = 'STANDARD'
+RISK_MODE = 'AGGRESSIVE'
 
 RISK_PROFILES = {
     'AGGRESSIVE': {

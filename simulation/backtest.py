@@ -14,7 +14,7 @@ import os
 
 import hashlib
 
-def fetch_historical_data(tickers, period='20y', interval='1d'):
+def fetch_historical_data(tickers, period=config.BACKTEST_PERIOD, interval='1d'):
     """
     Fetch a larger chunk of historical data for backtesting.
     Defaults to 5 years of 1d data (hourly data limited to ~2y).

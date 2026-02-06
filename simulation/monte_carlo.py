@@ -31,7 +31,7 @@ class MonteCarloSimulator:
         print("Fetching market data...")
         # Use fetch_historical_data instead of fetch_data (which is for live context)
         # 1y or 2y is usually sufficient for covariance estimation
-        self.data = self.fetcher.fetch_historical_data(period='2y') 
+        self.data = self.fetcher.fetch_historical_data(period=config.BACKTEST_PERIOD) 
         self.returns = self.fetcher.get_returns()
         
         if self.returns.empty:
