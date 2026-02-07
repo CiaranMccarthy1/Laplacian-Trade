@@ -2,41 +2,37 @@
 
 An advanced quantitative trading system leveraging **Spatial Graph Theory** and **Topological Data Analysis (TDA)** to detect market regimes and generate arbitrage signals.
 
-## 🚀 Latest Optimization Results
+## Optimized Portfolio Allocation Strategy
 
-Our comprehensive parameter optimization across 8 major market sectors has identified optimal configurations for maximum risk-adjusted returns:
+Based on comprehensive Monte Carlo analysis and sector optimization, the system employs a **Three-Tier Capital Allocation** approach:
 
-### 🏆 Top Performing Strategy
-- **Best Sector**: SECTOR_INDUSTRIALS 
-- **Optimal Parameters**: Alpha=0.3, Exposure=0.4, Lookback=80
-- **Sharpe Ratio**: **0.826** (exceptional risk-adjusted performance)
-- **Annualized Return**: **26.14%**
+### Portfolio Architecture
 
-### 📊 Sector Performance Rankings
-| Rank | Sector | Best Sharpe | Optimal Alpha | Optimal Exposure | Best Lookback |
-|------|--------|-------------|---------------|------------------|---------------|
-| 1 | SECTOR_INDUSTRIALS | **0.826** | 0.3 | 0.4 | 80 |
-| 2 | SECTOR_ENERGY | **0.712** | 0.3 | 0.9 | 120 |
-| 3 | SECTOR_FINANCIALS | **0.630** | 0.6 | 0.4 | 80 |
-| 4 | SECTOR_X_TECH | **0.599** | 0.3 | 0.9 | 80 |
-| 5 | SECTOR_COMMUNICATION | **0.513** | 0.6 | 0.9 | 80 |
-| 6 | SECTOR_HEALTHCARE | **0.369** | 0.6 | 0.4 | 80 |
-| 7 | SECTOR_CONSUMER_STAPLES | **0.312** | 0.6 | 0.9 | 80 |
-| 8 | SECTOR_CONSUMER_DISC | **0.125** | 0.3 | 0.9 | 80 |
+| Tier | Ticker Set | Allocation | Sectors |
+|------|-----------|------------|---------|
+| Defensive Core | `DEFENSIVE_CORE_45PCT` | 45% | Utilities (35.6), Industrials (30.8) |
+| Growth Engine | `GROWTH_ENGINE_30PCT` | 30% | Technology (19.6), Materials (21.8) |
+| Tactical Regime | `TACTICAL_REGIME_25PCT` | 25% | Financials (12.4), Energy (4.1) |
 
-### 🔍 Key Optimization Insights
-- **Alpha = 0.3** dominates top-performing configurations (7 of 8 best results)
-- **Industrial sector** shows exceptional consistency with 6 of top 8 configurations
-- **Energy sector** prefers higher exposure (0.9) with longer lookback (120)
-- **Mixed exposure preferences** by sector suggest sector-specific tuning is crucial
-- **Consumer Discretionary** significantly underperformed, requiring further investigation
+### Monte Carlo Risk Analysis (10-Year, $10k initial)
 
-### 🎯 Recommended Strategy Configuration
-Based on optimization results, we recommend:
-- **Primary Focus**: Industrial sector allocation
-- **Parameters**: Alpha=0.3, Exposure=0.4, Lookback=80
-- **Secondary**: Energy sector with higher exposure parameters
-- **Risk Management**: Standard profile (2% stop loss, 5% max drawdown)
+| Sector | VaR (95%) | CVaR (95%) | Expected Return | Risk-Adj Score |
+|--------|-----------|------------|-----------------|----------------|
+| Utilities | $1,191 | $1,949 | 424.1% | **35.6** |
+| Materials | $2,428 | $4,696 | 529.0% | **21.8** |
+| Industrials | $2,605 | $1,315 | 801.9% | **30.8** |
+| Technology | $10,559 | $3,418 | **2072.5%** | 19.6 |
+| Communication | $5,423 | $1,808 | 834.0% | 15.4 |
+
+### Current Parameters
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Alpha | 0.3 | Dominated 7 of 8 top configurations |
+| Net Exposure | 0.7 | Long-biased |
+| Lookback Window | 80 | Fast response for stable manifolds |
+| Risk Profile | STANDARD | 2% stop-loss, 5% max drawdown, 1.0x leverage |
+| Backtest Period | 10y | |
 
 ---
 
@@ -54,26 +50,25 @@ This project implements a novel trading strategy that models the market as a dyn
 2.  **Topological Layer (`topological/`)**:
     *   Converts correlation matrices into point clouds.
     *   Uses **Persistent Homology** (Vietoris-Rips filtration) to extract topological features (H0, H1).
-    *   Calculates **Persistence Entropy** to quantity market noise vs. signal (Stability Regime).
+    *   Calculates **Persistence Entropy** to quantify market noise vs. signal (Stability Regime).
 
 3.  **Integration Engine (`integration/`)**:
     *   Combines spatial residuals with topological regime stability.
-    *   Dynamic sizing: Reduces exposure during high-entropy (chaotic) regimes.
+    *   Dynamic alpha and leverage: Reduces both during high-entropy (chaotic) regimes.
     *   Generates Long/Short signals with configurable risk management (Stop Loss, Max Drawdown).
 
 ## Project Structure
 
 ```
-├── main.py               # Live/Single-step execution entry point
+├── main.py               # Live/single-step execution entry point
 ├── core/
-│   ├── config.py         # Global configuration (Tickers, Risk, Params)
+│   └── config.py         # Global configuration (tickers, risk, params)
 ├── simulation/
 │   ├── backtest.py       # Historical backtesting engine
 │   ├── monte_carlo.py    # Monte Carlo simulation engine
+│   └── run_sectors.py    # Cross-sector comparative analysis
 ├── optimization/
-│   ├── optimize.py       # Grid search parameter optimization
-├── utils/
-│   ├── check_delisted.py # Utility to check for delisted/survivor-bias tickers
+│   └── optimize.py       # Grid search parameter optimization
 ├── data/
 │   └── fetcher.py        # Data ingestion (YFinance)
 ├── spatial/
@@ -81,7 +76,9 @@ This project implements a novel trading strategy that models the market as a dyn
 ├── topological/
 │   └── homology.py       # TDA & Persistence Entropy logic
 ├── integration/
-│   └── decision_engine.py # Signal generation & Risk rules
+│   └── decision_engine.py # Signal generation & risk rules
+├── utils/
+│   └── check_delisted.py # Utility to check for delisted/survivor-bias tickers
 └── tests/                # Unit tests
 ```
 
@@ -89,7 +86,7 @@ This project implements a novel trading strategy that models the market as a dyn
 
 1.  **Clone the repository**:
     ```bash
-    git clone <repo-url>
+    git clone https://github.com/CiaranMccarthy1/trading-algo
     cd trading-algo
     ```
 
@@ -97,7 +94,6 @@ This project implements a novel trading strategy that models the market as a dyn
     ```bash
     python -m venv venv
     .\venv\Scripts\activate  # Windows
-    # source venv/bin/activate # Linux/Mac
     ```
 
 3.  **Install dependencies**:
@@ -107,21 +103,15 @@ This project implements a novel trading strategy that models the market as a dyn
 
 ## Usage
 
-**Note:** All scripts other than `main.py` should be run as modules from the project root to ensure imports work correctly.
+All scripts other than `main.py` should be run as modules from the project root.
 
-### Running a Backtest
-
-To test the strategy over historical data (configured in `core/config.py`):
+### Backtest
 
 ```bash
 python -m simulation.backtest
 ```
 
-Results (performance metrics and charts) will be saved to the `results/` directory.
-
 ### Monte Carlo Simulation
-
-To project future portfolio performance and assess risk (VaR/CVaR):
 
 ```bash
 python -m simulation.monte_carlo
@@ -129,83 +119,17 @@ python -m simulation.monte_carlo
 
 ### Sector Analysis
 
-To run simulations across all major market sectors and view a comparative report:
-
 ```bash
 python -m simulation.run_sectors
 ```
 
-**Standard Mode Sector Performance Report:**
-```text 
-SECTOR ANALYSIS REPORT (5 year)
-======================
-          Sector  Tickers Return Sharpe VaR (95%) CVaR (95%)
-   Communication       13 20.52%   0.59      $396       $985
-   Consumer Disc       14 -1.11%   0.01    $1,549     $2,168
-Consumer Staples       14 11.59%   0.46      $971     $1,532
-          Energy       14 35.93%   0.74    $2,594     $3,367
-      Financials       15 13.77%   0.45    $1,038     $1,626
-      Healthcare       15  7.11%   0.24    $1,690     $2,224
-     Industrials       15 37.72%   1.00      $555     $1,019
-          X Tech       15 21.83%   0.45    $2,722     $3,441
-       Materials       14  7.83%   0.25    $1,777     $2,297
-     Real Estate       15 -7.65%  -0.24    $2,071     $2,666
-       Utilities       15 18.51%   0.47      $588     $1,267
-     TOTAL / AVG      159 15.09%   0.40   $15,951    $22,592
-```
-
-### Current Performance (10-Year Backtest)(S&P 500 subset) 
-
-*Configuration: Aggressive Mode, 1.5x Leverage, Daily Interval*
-
-```text
-Final Portfolio Value: 2.3808
-Sharpe Ratio (Approx): 0.73
-Average Annual Return: 8.71% 
-```
-
-**Annual Breakdown:**
-| Year | Return | Sharpe |
-|------|--------|--------|
-| 2016 | -1.56% | -0.55  |
-| 2017 | 6.83%  | 1.12   |
-| 2018 | 8.88%  | 0.71   |
-| 2019 | 11.16% | 0.83   |
-| 2020 | 38.99% | 1.58   |
-| 2021 | 3.45%  | 0.42   |
-| 2022 | -3.68% | -0.36  |
-| 2023 | 8.59%  | 1.06   |
-| 2024 | 20.07% | 1.15   |
-| 2025 | 0.37%  | 0.02   |
-| 2026 | 2.71%  | 2.31   |
-
 ### Parameter Optimization
-
-To find optimal parameters (Alpha, Exposure, Lookback) across all sectors via grid search:
 
 ```bash
 python -m optimization.optimize
 ```
 
-**Latest Optimization Run:**
-- **Sectors Tested**: 8 major GICS sectors (Materials, Real Estate, Utilities excluded for performance)
-- **Parameter Grid**: 
-  - Alpha: [0.3, 0.6] 
-  - Exposure: [0.4, 0.7, 0.9]
-  - Lookback: [80, 120]
-- **Total Configurations**: 96 backtests across 8 sectors
-- **Data Period**: 20 years historical data
-- **Best Result**: Industrial sector with Sharpe ratio of 0.826
-
-The optimization automatically:
-- Tests all parameter combinations on each sector
-- Reports best configuration per sector
-- Identifies overall optimal strategy
-- Saves detailed results for further analysis
-
-### Live/Single Step
-
-To run a single iteration (e.g., for Cron jobs or live trading loops):
+### Live / Single Step
 
 ```bash
 python main.py
@@ -213,15 +137,21 @@ python main.py
 
 ## Configuration
 
-Edit `core/config.py` to adjust:
-*   **TICKERS**: List of assets to trade (default: S&P 500 subset).
-*   **RISK_MODE**: 'AGGRESSIVE', 'STANDARD', or 'CAUTIOUS'.
-*   **NET_EXPOSURE**: Strategy bias (0.0 = Market Neutral, 1.0 = Long Only).
-*   **ALPHA**: Diffusion coefficient for the spatial graph.
+Edit `core/config.py` to switch ticker sets or adjust parameters:
+
+```python
+ACTIVE_TICKER_SET = 'OPTIMIZED_PORTFOLIO_100PCT'  # Full strategy (default)
+ACTIVE_TICKER_SET = 'DEFENSIVE_CORE_45PCT'         # 45% defensive core
+ACTIVE_TICKER_SET = 'GROWTH_ENGINE_30PCT'          # 30% growth engine
+ACTIVE_TICKER_SET = 'TACTICAL_REGIME_25PCT'        # 25% tactical regime
+
+ACTIVE_TICKER_SET = 'SECTOR_UTILITIES'             # Individual sector
+ACTIVE_TICKER_SET = 'SECTOR_TECHNOLOGY'            # Individual sector
+```
+
+Available risk modes: `HYPER_AGGRESSIVE`, `AGGRESSIVE`, `GROWTH`, `STANDARD`, `BALANCED`, `INSTITUTIONAL`, `PENSION_FUND`, `CONSERVATIVE`, `ULTRA_CONSERVATIVE`, `CAUTIOUS`.
 
 ## Testing
-
-Run unit tests to ensure all components are functioning correctly:
 
 ```bash
 pytest tests

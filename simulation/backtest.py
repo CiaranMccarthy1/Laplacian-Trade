@@ -9,9 +9,6 @@ from topological.homology import TopologicalFeatureExtractor
 from integration.decision_engine import IntegrationEngine
 import sys
 import os
-
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import hashlib
 
 def fetch_historical_data(tickers, period=config.BACKTEST_PERIOD, interval='1d'):
@@ -26,7 +23,7 @@ def fetch_historical_data(tickers, period=config.BACKTEST_PERIOD, interval='1d')
     safe_period = period.replace(" ", "")
     safe_interval = interval.replace(" ", "")
     
-    if config.ACTIVE_TICKER_SET == 'S_AND_P_FULL' and not tickers:
+    if config.ACTIVE_TICKER_SET == 'SP500_FULL_UNIVERSE' and not tickers:
         from data.fetcher import DataFetcher
         tickers = DataFetcher.fetch_sp500_tickers()
         print(f"Fetched {len(tickers)} tickers for S&P 500 List.")
@@ -121,8 +118,7 @@ def run_backtest(override_params=None):
     config.NET_EXPOSURE = exposure 
     
     portfolio_values = [1.0]
-    pnl_history = []
-    
+
     window_size = lookback
     
     print(f"\nRunning backtest on {len(all_returns)} bars with window={window_size}...")
@@ -154,13 +150,49 @@ def run_backtest(override_params=None):
                     diagrams = topo.compute_persistence_diagrams(dist_matrix)
                     regime_metrics = topo.get_regime_metrics(diagrams)
                     last_regime_metrics = regime_metrics 
-                    
+
                     h_entropy = regime_metrics.get('persistence_entropy_h1', 0.0)
-                    
-                    if h_entropy > 0.5:
-                         dynamic_alpha = 0.05
-                    else:
-                         dynamic_alpha = alpha
+
+                    if h_entropy > 0.7:     
+                        dynamic_alpha = alpha * 0.6  
+                    elif h_entropy > 0.4:    
+                        dynamic_alpha = alpha * 0.8  
+                    else:                   
+                        dynamic_alpha = alpha
+
+                    max_leverage = config.RISK_PROFILES[config.RISK_MODE]['LEVERAGE_MULTIPLIER']
+
+                    recent_vol = window_returns.std().mean()
+                    rolling_corr = window_returns.corr().values
+                    avg_correlation = np.nanmean(rolling_corr[np.triu_indices_from(rolling_corr, k=1)])
+
+                    leverage_factor = 1.0
+
+                    if h_entropy > 0.7:
+                        leverage_factor *= 0.5
+                    elif h_entropy > 0.5:
+                        leverage_factor *= 0.7
+                    elif h_entropy > 0.3:
+                        leverage_factor *= 0.9
+
+                    if recent_vol > 0.025:
+                        leverage_factor *= 0.6
+                    elif recent_vol > 0.015:
+                        leverage_factor *= 0.8
+
+                    if avg_correlation > 0.8:
+                        leverage_factor *= 0.7
+                    elif avg_correlation > 0.6:
+                        leverage_factor *= 0.85
+
+                    dynamic_leverage = min(max_leverage * leverage_factor, max_leverage)
+
+                    engine.leverage_multiplier = dynamic_leverage
+
+                    if i % 50 == 0:
+                        print(f"Market Conditions - H_entropy: {h_entropy:.3f}, Vol: {recent_vol:.4f}, Corr: {avg_correlation:.3f}")
+                        print(f"Dynamic Leverage: {dynamic_leverage:.2f}x (Max: {max_leverage:.2f}x)")
+
                 else:
                     regime_metrics = last_regime_metrics
                     
@@ -257,8 +289,7 @@ def run_backtest(override_params=None):
         plt.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.tight_layout()
-        
+
         os.makedirs("results", exist_ok=True)
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = os.path.join("results", f'backtest_performance_sharpe_{sharpe:.2f}_{timestamp_str}.png')

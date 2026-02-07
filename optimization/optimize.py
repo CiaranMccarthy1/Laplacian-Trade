@@ -16,19 +16,17 @@ def optimize():
     parameter set for each sector and overall.
     """
 
-    alphas = [0.3, 0.6]  # Low, mid, and high alpha values
-    exposures = [0.4, 0.7, 0.9]  # Moderate and higher exposure
-    lookback_windows = [80, 120]  # Short-medium and medium term lookbacks
+    alphas = [0.3, 0.6]
+    exposures = [0.4, 0.7, 0.9]
+    lookback_windows = [80, 120]
 
-    # Get only sector ticker sets 
     sector_sets = {
         name: tickers for name, tickers in config.TICKER_SETS.items() 
         if name.startswith('SECTOR_') and len(tickers) > 0
     }
 
-    # Only include S_AND_P_FULL if it has tickers (exclude DEFAULT)
-    if config.TICKER_SETS['S_AND_P_FULL']:
-        sector_sets['S_AND_P_FULL'] = config.TICKER_SETS['S_AND_P_FULL']
+    if config.TICKER_SETS['SP500_FULL_UNIVERSE']:
+        sector_sets['SP500_FULL_UNIVERSE'] = config.TICKER_SETS['SP500_FULL_UNIVERSE']
 
     print(f"Found {len(sector_sets)} ticker sets to optimize: {list(sector_sets.keys())}")
     print(f"Parameter combinations per sector: {len(alphas) * len(exposures) * len(lookback_windows)}")
@@ -43,7 +41,6 @@ def optimize():
         print(f"OPTIMIZING SECTOR: {sector_name} ({len(sector_tickers)} tickers)")
         print(f"{'='*60}")
 
-        # Fetch data for this sector
         print(f"Fetching data for {sector_name} (20y)...")
         try:
             backtest.fetch_historical_data(sector_tickers, period='20y', interval='1d')
@@ -58,7 +55,6 @@ def optimize():
             print(f"\n--- [{count}/{total_runs}] {sector_name}: Alpha={alpha}, Exposure={exposure}, Lookback={lookback} ---")
 
             try:
-                # Temporarily override the tickers for this backtest
                 original_tickers = config.TICKERS
                 config.TICKERS = sector_tickers
 
@@ -69,7 +65,6 @@ def optimize():
                     'REBALANCE_FREQUENCY': 5 
                 })
 
-                # Restore original tickers
                 config.TICKERS = original_tickers
 
                 if metrics:
@@ -88,11 +83,9 @@ def optimize():
 
             except Exception as e:
                 print(f"Error in optimization step: {e}")
-                # Restore original tickers in case of error
                 config.TICKERS = original_tickers
                 continue
 
-        # Show best results for this sector
         if sector_results:
             df_sector = pd.DataFrame(sector_results)
             best_sector = df_sector.sort_values(by='Sharpe', ascending=False).iloc[0]
@@ -104,23 +97,19 @@ def optimize():
         print("No results obtained from optimization.")
         return
 
-    # Show overall results
     df_all = pd.DataFrame(all_results)
     print(f"\n{'='*60}")
     print("OVERALL OPTIMIZATION RESULTS")
     print(f"{'='*60}")
 
-    # Top performers across all sectors
     print(f"\nTop {min(8, len(df_all))} configurations (by Sharpe Ratio):")
     top_configs = df_all.sort_values(by='Sharpe', ascending=False).head(8)
     print(top_configs.to_string(index=False))
 
-    # Best performing sector summary
     print("\nBest configuration by sector:")
     sector_summary = df_all.loc[df_all.groupby('Sector')['Sharpe'].idxmax()]
     print(sector_summary[['Sector', 'Alpha', 'Exposure', 'Lookback', 'Sharpe', 'Return']].to_string(index=False))
 
-    # Overall best
     overall_best = df_all.sort_values(by='Sharpe', ascending=False).iloc[0]
     print(f"\nOverall optimal configuration:")
     print(f"Sector: {overall_best['Sector']}")

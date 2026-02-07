@@ -7,10 +7,13 @@ import core.config as config
 from simulation import backtest
 from simulation.monte_carlo import MonteCarloSimulator
 
-# Ensure output is unbuffered
 sys.stdout.reconfigure(encoding='utf-8')
 
 def run_sector_analysis():
+    """
+    Run backtests and Monte Carlo simulations across all SECTOR_ ticker sets,
+    then aggregate and display a comparative performance report.
+    """
     print("Starting Sector Analysis...")
     print("===========================")
     
@@ -24,16 +27,14 @@ def run_sector_analysis():
         
         print(f"\nProcessing Sector: {sector_name} ({len(tickers)} tickers)")
         print("-" * 40)
-        
-        # Run Backtest
+
         print(" > Running Backtest...")
         bt_metrics = backtest.run_backtest(override_params={
             'TICKERS': tickers
         })
         if not bt_metrics:
             bt_metrics = {'Return': 0.0, 'Sharpe': 0.0}
-            
-        # Run Monte Carlo
+
         print(" > Running Monte Carlo Simulation...")
         mc = MonteCarloSimulator(tickers=tickers)
         mc_metrics = mc.run()
@@ -49,30 +50,26 @@ def run_sector_analysis():
             'CVaR (95%)': mc_metrics.get('CVaR_95', 0.0)
         })
         
-    # Aggregate Rules
     if not results:
         print("No results generated.")
         return
 
     df = pd.DataFrame(results)
-    
-    # Calculate Total/Average row
+
     total_row = {
         'Sector': 'TOTAL / AVG',
         'Tickers': df['Tickers'].sum(),
         'Return': df['Return'].mean(),
         'Sharpe': df['Sharpe'].mean(),
-        'VaR (95%)': df['VaR (95%)'].sum(),   # Sum of VaR is a conservative estimate of portfolio VaR (ignoring diversification benefits)
+        'VaR (95%)': df['VaR (95%)'].sum(),
         'CVaR (95%)': df['CVaR (95%)'].sum()
     }
-    
+
     df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
-    
-    # Formating for display
+
     print("\n\nSECTOR ANALYSIS REPORT")
     print("======================")
-    
-    # Format columns
+
     display_df = df.copy()
     display_df['Return'] = display_df['Return'].map('{:.2%}'.format)
     display_df['Sharpe'] = display_df['Sharpe'].map('{:.2f}'.format)
@@ -80,8 +77,7 @@ def run_sector_analysis():
     display_df['CVaR (95%)'] = display_df['CVaR (95%)'].map('${:,.0f}'.format)
     
     print(display_df.to_string(index=False))
-    
-    # Save to CSV
+
     os.makedirs('results', exist_ok=True)
     filename = 'results/sector_analysis.csv'
     df.to_csv(filename, index=False)

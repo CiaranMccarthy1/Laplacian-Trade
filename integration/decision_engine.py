@@ -51,9 +51,8 @@ class IntegrationEngine:
         
         top_n = 10
         
-        shorts = sorted_z[sorted_z > 0].head(top_n)
-        
-        longs = sorted_z[sorted_z < 0].tail(top_n)
+        longs = sorted_z[sorted_z > 0].head(top_n)  
+        shorts = sorted_z[sorted_z < 0].tail(top_n) 
         
         multiplier = self.calculate_regime_multiplier(regime_metrics)
         
