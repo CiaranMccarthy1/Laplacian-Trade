@@ -4,32 +4,45 @@ Configuration for the Topological Arbitrage System.
 
 # --- Tickers ---
 TICKERS = [
-    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA',
-    'JPM', 'BAC', 'GS', 'MS',
-    'XOM', 'CVX',
-    'JNJ', 'PFE',
+    'XLE',
+    'XOM',
+    'VLO',
+    'UNG',
+    'GLD',
+    'SLV',
+    'FCX',
+    'NEM',
+    'DBA',
+    'ADM',
+    'NTR',
+    'CAT',
+    'DE',
+    'NVDA',
+    'MSFT',
+    'AAPL',
+    'TSLA'
 ]
 
 # --- Data ---
 TIMEFRAME = '1d'
-BACKTEST_PERIOD = '5y'
+BACKTEST_PERIOD = '10y'
 LOOKBACK_WINDOW = 80
 
 # --- Spatial Graph ---
 ALPHA = 0.3
-CORRELATION_THRESHOLD = 0.7
+CORRELATION_THRESHOLD = 0.45
 
 # --- Topological ---
 MAX_DIMENSION = 3
 
 # --- Trading ---
-NET_EXPOSURE = 0.7
-TRANSACTION_COST_BPS = 0.0010
+NET_EXPOSURE = 0.85
+TRANSACTION_COST_BPS = 0.0003
 REBALANCE_FREQUENCY = 10
 
 # --- Risk ---
-STOP_LOSS_PCT = 0.02
-MAX_DRAWDOWN_LIMIT = 0.05
+STOP_LOSS_PCT = 0.05
+MAX_DRAWDOWN_LIMIT = 0.15
 LEVERAGE_MULTIPLIER = 1.0
 
 # --- Monte Carlo ---
