@@ -4,28 +4,17 @@ Configuration for the Topological Arbitrage System.
 
 # --- Tickers ---
 TICKERS = [
-    'XLE',
-    'XOM',
-    'VLO',
-    'UNG',
-    'GLD',
-    'SLV',
-    'FCX',
-    'NEM',
-    'DBA',
-    'ADM',
-    'NTR',
-    'CAT',
-    'DE',
-    'NVDA',
-    'MSFT',
-    'AAPL',
-    'TSLA'
+    'NEE',      # NextEra Energy (largest US utility)
+    'D',        # Dominion Energy
+    'DUK',      # Duke Energy
+    'SO',       # Southern Company
+    'AEP',      # American Electric Power
+    'XEL',      # Xcel Energy
 ]
 
 # --- Data ---
 TIMEFRAME = '1d'
-BACKTEST_PERIOD = '10y'
+BACKTEST_PERIOD = '20y'
 LOOKBACK_WINDOW = 80
 
 # --- Spatial Graph ---
@@ -41,4 +30,6 @@ REBALANCE_FREQUENCY = 10
 
 # --- Risk ---
 LEVERAGE_MULTIPLIER = 1.0
-
+STOP_LOSS_PCT = 0.05
+MAX_DRAWDOWN_LIMIT = 0.15
+

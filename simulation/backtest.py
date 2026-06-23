@@ -89,7 +89,10 @@ def run_backtest():
             current_weights.loc[active.index] = active
         else:
             # Maintain stationary weights between rebalance periods.
-            current_weights = prev_weights
+            current_weights = prev_weights.copy()
+
+        
+        current_weights[(current_weights * all_returns.iloc[i]) < -config.STOP_LOSS_PCT] = 0.0
 
         # Transaction Cost Impact: Turnover-based slippage calculation.
         turnover = np.sum(np.abs(current_weights - prev_weights))

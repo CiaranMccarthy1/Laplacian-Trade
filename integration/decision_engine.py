@@ -39,11 +39,10 @@ class IntegrationEngine:
             topo_scalar = 0.95
         
         # Drawdown Shield: Hard protection of principal.
-        # De-leverages aggressively as portfolio equity hits the 10-12% DD floor.
         dd_scalar = 1.0
-        if current_drawdown < -0.10:
+        if current_drawdown < -config.MAX_DRAWDOWN_LIMIT:
             dd_scalar = 0.0  # Stop-trading protocol triggered.
-        elif current_drawdown < -0.05:
+        elif current_drawdown < -(config.MAX_DRAWDOWN_LIMIT * 0.5):
             dd_scalar = 0.5
             
         # Volatility Targeting: Ensures consistent risk contribution.
