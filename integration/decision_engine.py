@@ -14,8 +14,6 @@ class IntegrationEngine:
     """
 
     def __init__(self):
-        self.stop_loss_pct = config.STOP_LOSS_PCT
-        self.max_drawdown_limit = config.MAX_DRAWDOWN_LIMIT
         self.leverage_multiplier = config.LEVERAGE_MULTIPLIER
         self.target_annual_vol = 0.25 
         self.prev_persistence = 0.0

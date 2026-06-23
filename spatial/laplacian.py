@@ -27,15 +27,14 @@ class SpatialGraph:
         self.laplacian = nx.normalized_laplacian_matrix(G).toarray()
         return self.laplacian
 
-    def compute_diffusion_signal(self, current_returns: pd.Series, override_alpha: float = None) -> pd.Series:
+    def compute_diffusion_signal(self, current_returns: pd.Series) -> pd.Series:
         """Solve h = (I - α·L)⁻¹ · x  for the equilibrium diffusion state."""
         if self.laplacian is None:
             raise ValueError("Laplacian not computed. Call build_graph and compute_laplacian first.")
 
         x = current_returns.values
         n = len(x)
-        alpha = override_alpha if override_alpha is not None else self.alpha
-        A = np.eye(n) - alpha * self.laplacian
+        A = np.eye(n) - self.alpha * self.laplacian
 
         try:
             h = np.linalg.solve(A, x)

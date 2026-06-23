@@ -1,9 +1,7 @@
 numpy
 pandas
 networkx
-scikit-learn
 ripser
-persim
 yfinance
 matplotlib
 pytest

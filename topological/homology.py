@@ -28,30 +28,14 @@ class TopologicalFeatureExtractor:
         h1 = diagrams[1]
 
         if h1.size == 0:
-            return {'max_persistence_h1': 0.0, 'total_persistence_h1': 0.0}
+            return {'max_persistence_h1': 0.0}
 
         finite_h1 = h1[np.isfinite(h1[:, 1])]
         if finite_h1.size == 0:
-            return {'max_persistence_h1': 0.0, 'total_persistence_h1': 0.0}
+            return {'max_persistence_h1': 0.0}
 
         persistence = finite_h1[:, 1] - finite_h1[:, 0]
 
         return {
             'max_persistence_h1': float(np.max(persistence)),
-            'total_persistence_h1': float(np.sum(persistence)),
-            'avg_persistence_h1': float(np.mean(persistence)),
-            'num_loops': len(persistence),
-            'persistence_entropy_h1': self._persistence_entropy(persistence),
         }
-
-    @staticmethod
-    def _persistence_entropy(persistence_values: np.ndarray) -> float:
-        """H = −Σ pᵢ log₂ pᵢ  where pᵢ = lᵢ / Σlᵢ."""
-        if persistence_values.size == 0:
-            return 0.0
-        total = np.sum(persistence_values)
-        if total == 0:
-            return 0.0
-        probs = persistence_values / total
-        probs = probs[probs > 0]
-        return float(-np.sum(probs * np.log2(probs)))
