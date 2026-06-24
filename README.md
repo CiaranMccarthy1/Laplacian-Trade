@@ -33,14 +33,19 @@ The strategy delivered positive risk-adjusted returns over 20 years, with strong
 
 | Metric | Value |
 |--------|-------|
-| Mean final equity | 2.49 |
+| Simulations | 100 |
+| Mean final equity | 2.84 |
 | Median final equity | 2.17 |
-| VaR (95%) | 0.83 |
-| CVaR (95%) | 0.71 |
-| Probability of loss | 10.0% |
-| Upside potential (95%) | 398.19% |
+| Std Dev | 2.85 |
+| VaR (95%) | 0.68 |
+| CVaR (95%) | 0.60 |
+| Probability of loss | 18.0% |
+| Expected loss (VaR) | 32.34% |
+| Upside potential (95%) | 525.37% |
+| Mean annual return | 4.57% |
+| Std annual return | 15.55% |
 
-The distribution is right-skewed — most outcomes cluster around the median (2.17x), with a small number of high-return paths pulling the mean higher (2.49x). The 10% probability of loss and 95% VaR of 0.83 demonstrate robust risk management.
+The distribution is highly right-skewed — most outcomes cluster around the median (2.17x), with a small number of extreme paths pulling the mean higher (2.84x). The 18% probability of loss reflects the strategy's sensitivity to regime timing. The wide standard deviation (2.85) indicates substantial path dependency in bootstrapped returns.
 
 
 ## Stack
