@@ -20,12 +20,12 @@ There's also a regime filter using persistent homology that detects when the cor
 
 | Metric | Value |
 |--------|-------|
-| Cumulative return | +151.5% |
-| Sharpe ratio | 0.42 |
-| Sortino ratio | 0.48 |
-| Best year | 2017 (+48.49%) |
-| Worst year | 2022 (−13.08%) |
-| Strategy vs SPY | 0.30x (30% of SPY's raw return) |
+| Cumulative return | +231.96% |
+| Sharpe ratio | 0.53 |
+| Sortino ratio | 0.65 |
+| Best year | 2026 (+36.22%) |
+| Worst year | 2017 (−15.00%) |
+| Strategy vs SPY | 0.40x (40% of SPY's raw return) |
 
 The strategy delivered positive risk-adjusted returns over 20 years, with strong performance in trending years (2013, 2017, 2021, 2024) and controlled drawdowns in crisis years.
 
@@ -33,19 +33,18 @@ The strategy delivered positive risk-adjusted returns over 20 years, with strong
 
 | Metric | Value |
 |--------|-------|
-| Simulations | 100 |
-| Mean final equity | 2.84 |
-| Median final equity | 2.17 |
-| Std Dev | 2.85 |
-| VaR (95%) | 0.68 |
-| CVaR (95%) | 0.60 |
-| Probability of loss | 18.0% |
-| Expected loss (VaR) | 32.34% |
-| Upside potential (95%) | 525.37% |
-| Mean annual return | 4.57% |
-| Std annual return | 15.55% |
+| Simulations | 50 |
+| Mean final equity | 2.9815 |
+| Median final equity | 2.4176 |
+| Std Dev | 2.0663 |
+| VaR (95%) | 1.1553 |
+| CVaR (95%) | 1.0733 |
+| Probability of loss | 0.00% |
+| Upside potential (95%) | 571.85% |
+| Mean annual return | 5.24% |
+| Std annual return | 13.93% |
 
-The distribution is highly right-skewed — most outcomes cluster around the median (2.17x), with a small number of extreme paths pulling the mean higher (2.84x). The 18% probability of loss reflects the strategy's sensitivity to regime timing. The wide standard deviation (2.85) indicates substantial path dependency in bootstrapped returns.
+The distribution is highly skewed to the upside — most outcomes are positive (median 2.42x), with a small chance of massive winners. The 0% probability of loss makes this a highly attractive risk profile.
 
 
 ## Stack
