@@ -4,13 +4,27 @@ Configuration for the Topological Arbitrage System.
 
 # --- Tickers ---
 TICKERS = [
-    'NEE',      # NextEra Energy (largest US utility)
-    'D',        # Dominion Energy
-    'DUK',      # Duke Energy
-    'SO',       # Southern Company
-    'AEP',      # American Electric Power
-    'XEL',      # Xcel Energy
+    'CVX', 
+    'NEE', 
+    'DUK',
+    'SO',
+    'AAPL',
+    'MSFT', 
+    'NVDA', 
+    'AMD',
+    'JPM', 
+    'GS',
+    'JNJ',
+    'PFE', 
+    'UNH',
+    'AMZN', 
+    'MCD',
+    'PG', 
+    'CAT',
+    'GOOGL', 
+    'META'
 ]
+
 
 # --- Data ---
 TIMEFRAME = '1d'
@@ -25,11 +39,13 @@ CORRELATION_THRESHOLD = 0.45
 MAX_DIMENSION = 3
 
 # --- Trading ---
-TRANSACTION_COST_BPS = 0.0003
-REBALANCE_FREQUENCY = 10
+TRANSACTION_COST_BPS = 0.001
+REBALANCE_FREQUENCY = 20
+
+MONTE_CARLO_SAMPLES = 1
 
 # --- Risk ---
-LEVERAGE_MULTIPLIER = 1.0
+LEVERAGE_MULTIPLIER = 1
 STOP_LOSS_PCT = 0.05
 MAX_DRAWDOWN_LIMIT = 0.15
 

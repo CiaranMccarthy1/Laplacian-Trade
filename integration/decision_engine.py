@@ -4,58 +4,23 @@ from typing import Dict
 from core import config
 
 class IntegrationEngine:
-    """
-    Topological Alpha Engine (TAE)
-    ------------------------------
-    A systematic global macro engine utilizing Spectral Graph Theory and 1st-order 
-    Persistent Homology (H1) to detect structural market regimes. TAE identifies 
-    asset decoupling within a manifold of Tech and Commodity clusters to execute 
-    adaptive Momentum and Mean-Reversion signals.
-    """
 
     def __init__(self):
         self.leverage_multiplier = config.LEVERAGE_MULTIPLIER
-        self.target_annual_vol = 0.25 
+        self.target_annual_vol = 0.35 
         self.prev_persistence = 0.0
+        self.regime_state = 'neutral'
+        self.regime_counter = 0
+        self.max_drawdown_limit = config.MAX_DRAWDOWN_LIMIT
+        
 
     def get_risk_scalars(self, h1_persistence: float, current_drawdown: float, returns_history: pd.Series) -> float:
-        """
-        Calculates a composite risk scalar based on structural stability, 
-        portfolio drawdown, and realized volatility.
-        """
-        # Persistence Decay: Early Warning System
-        # Reduces exposure by 15% if the market manifold begins to 'loosen' 
-        # before price action confirms a reversal.
-        persistence_decay = 1.0
-        if h1_persistence < self.prev_persistence:
-            persistence_decay = 0.85
-        self.prev_persistence = h1_persistence
-
-        # Topological Confidence: Scales risk based on the clarity of H1 features.
-        topo_scalar = 1.0
-        if h1_persistence < 0.05:
-            topo_scalar = 0.10  # Structural noise detected; move to minimal size.
-        elif h1_persistence < 0.12:
-            topo_scalar = 0.95
-        
-        # Drawdown Shield: Hard protection of principal.
-        dd_scalar = 1.0
-        if current_drawdown < -config.MAX_DRAWDOWN_LIMIT:
-            dd_scalar = 0.0  # Stop-trading protocol triggered.
-        elif current_drawdown < -(config.MAX_DRAWDOWN_LIMIT * 0.5):
-            dd_scalar = 0.5
-            
-        # Volatility Targeting: Ensures consistent risk contribution.
-        # Scales leverage inversely to realized vol; includes a 'Persistence Buffer'
-        # to allow larger swings during high-conviction structural shifts.
-        vol_scalar = 1.0
-        if returns_history is not None and len(returns_history) > 20:
-            real_vol = returns_history.tail(20).std() * np.sqrt(252)
-            if real_vol > 1e-6:
-                persistence_buffer = 1.2 if real_vol > 0.30 else 1.0
-                vol_scalar = np.clip((self.target_annual_vol / real_vol) * persistence_buffer, 0.7, 2.0)
-                
-        return topo_scalar * dd_scalar * vol_scalar * persistence_decay
+            if current_drawdown < -self.max_drawdown_limit:
+                return 0.0
+            elif current_drawdown < 0:
+                return 1.0 + (current_drawdown / self.max_drawdown_limit)
+            else:
+                return 1.0
 
     def get_adaptive_net_exposure(self, h1_persistence: float) -> float:
         """
@@ -63,33 +28,37 @@ class IntegrationEngine:
         full directional bias (Net=1.0). Chaotic regimes (H1 < 0.08) force 
         a Market-Neutral profile (Net=0.0).
         """
-        if h1_persistence > 0.18:
+        if h1_persistence > 0.04:
             return 1.0
-        if h1_persistence < 0.08:
+        if h1_persistence < 0.0015:
             return 0.0 
         return 0.85
 
     def generate_signals(self, residuals: pd.Series, regime_metrics: Dict[str, float], 
-                         current_drawdown: float = 0.0, returns_history: pd.Series = None) -> pd.DataFrame:
+                     current_drawdown: float = 0.0, returns_history: pd.Series = None) -> pd.DataFrame:
         """
-        Synthesizes Z-scored Graph Laplacian residuals into actionable position weights.
-        Operates in 'Trend Capture' mode when persistence is high, and 'Arbitrage' 
-        mode during structural consolidation.
+        Simplified signal generation without confidence filtering.
+        Uses binary regime switch with hysteresis for energy markets.
         """
         
         z_scores = (residuals - residuals.mean()) / (residuals.std() + 1e-6)
         h1_persistence = regime_metrics.get('max_persistence_h1', 0.0)
         
-        # Regime Identification: Trend vs Mean-Reversion.
-        is_trending = h1_persistence > 0.05 
-        raw_signals = z_scores if is_trending else -z_scores 
-
-        # Compute risk-adjusted leverage and exposure bias.
-        risk_multiplier = self.get_risk_scalars(h1_persistence, current_drawdown, returns_history)
-        adaptive_net = self.get_adaptive_net_exposure(h1_persistence)
+        # --- REGIME SWITCH  ---
+        # 0.02 = trend threshold, 0.01 = revert threshold
+        if h1_persistence > 0.025:
+            self.regime_counter = min(self.regime_counter + 1, 3)
+            if self.regime_counter >= 2:
+                self.regime_state = 'trend'
+        elif h1_persistence < 0.01:
+            self.regime_counter = max(self.regime_counter - 1, -3)
+            if self.regime_counter <= -2:
+                self.regime_state = 'revert'
+        # else: stay in current regime
         
-        # Signal Filtering: Focus capital only on the top 6 topological outliers 
-        # that exceed 1.0 standard deviations (or 0.4 in low-vol regimes).
+        raw_signals = z_scores if self.regime_state == 'trend' else -z_scores
+        
+        # --- SIGNAL FILTERING  ---
         significant = raw_signals[abs(raw_signals) > 1.0]
         if significant.empty:
             significant = raw_signals[abs(raw_signals) > 0.4]
@@ -98,17 +67,23 @@ class IntegrationEngine:
         top_n = min(6, len(sorted_sig))
         longs = sorted_sig[sorted_sig > 0].head(top_n)
         shorts = sorted_sig[sorted_sig < 0].tail(top_n)
-
+        
+        # --- RISK MANAGEMENT ---
+        risk_multiplier = self.get_risk_scalars(h1_persistence, current_drawdown, returns_history)
+        adaptive_net = self.get_adaptive_net_exposure(h1_persistence)
+        
+        # Apply risk scalers 
         active_leverage = self.leverage_multiplier * risk_multiplier
         
-        # Dynamic Weight Allocation based on Adaptive Net Exposure.
         long_total = ((1.0 + adaptive_net) / 2.0) * active_leverage
         short_total = ((1.0 - adaptive_net) / 2.0) * active_leverage
-
+        
         signals = pd.DataFrame(0.0, index=residuals.index, columns=['Signal'])
         if not longs.empty:
-            signals.loc[longs.index, 'Signal'] = long_total / len(longs)
+            exp_weights = np.exp(longs * 0.5)
+            signals.loc[longs.index, 'Signal'] = long_total * exp_weights / exp_weights.sum()
         if not shorts.empty:
-            signals.loc[shorts.index, 'Signal'] = -short_total / len(shorts)
-
+            exp_weights = np.exp(np.abs(shorts) * 0.5)
+            signals.loc[shorts.index, 'Signal'] = -short_total * exp_weights / exp_weights.sum()
+        
         return signals
